@@ -52,8 +52,8 @@ with gr.Blocks() as demo:
             video_up_angles = gr.Textbox(label="Video up angles", value="-1.4 -1.2 -1.0 -0.8 -0.7 -0.65 -0.6 -0.4 -0.2 0.0 0.2 0.4 0.6 0.8 1.0 1.2 1.4")
             mul_video_btn = gr.Button("create multiply view videos")
         with gr.Row():
-            image_v_angles = gr.Textbox(label="Image vertical angles", value="-1.4 -1.2 -1.0 -0.8 -0.7 -0.65 -0.6 -0.4 -0.2 0.0 0.2 0.4 0.6 0.8 1.0 1.2 1.4")
-            image_h_angles = gr.Textbox(label="Image horizontal angles", value="-0.75 -0.5 -0.25 0 0.25 0.5 0.75 1")
+            image_v_angles = gr.Textbox(label="Image vertical angles", value="-1.2 -1.0 -0.8 -0.7 -0.65 -0.6 -0.4 -0.2 0.0 0.2 0.4 0.6 0.8 1.0 1.2")
+            image_h_angles = gr.Textbox(label="Image horizontal angles", value="-0.5 -0.4 -0.3 -0.25 -0.15 -0.1 0 0.1 0.15 0.25 0.3 0.4 0.5 0.57")
             img_name_type = gr.Dropdown(label="Name type", choices=['index', 'parameter'], value='index') 
             mul_img_btn = gr.Button("create multiply view images")
 
