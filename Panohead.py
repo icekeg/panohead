@@ -41,6 +41,7 @@ with gr.Blocks() as demo:
             output_video = gr.Video(label="Post video", height=384, width=384)  
         with gr.Row(elem_id="create finetune model"):
             finetune_steps = gr.Slider(label="Finetune steps",minimum=100,maximum=5000,step=100,value=500)
+            finetune_steps_pti = gr.Slider(label="Finetune steps for pti",minimum=100,maximum=5000,step=100,value=500)
             createMesh = gr.Checkbox(False,label="Create geomtry?")
             mesh_type = gr.Dropdown(label="Mesh type", choices=['.ply','.mrc'], value='.ply')     
         finetune_btn = gr.Button("create finetune model")
@@ -118,10 +119,10 @@ with gr.Blocks() as demo:
     ##############################
     #   create finetune modle    #
     ##############################
-    def gen_finetunemodel(projectlabel,tune_steps,needMesh,meshtype):
+    def gen_finetunemodel(projectlabel,tune_steps, tune_steps_pti,needMesh,meshtype):
         
         floder_name = projectlabel['label']
-        finetune_command = "python projector_withseg_new.py --outdir=" + finetune_path + " --target_img=dataset/" + floder_name + "/img --network models/" + source_Model + " --idx 0 --num-steps " + str(tune_steps) + " --idx 0 --num-steps-pti " + str(tune_steps) + " --shapes=" + str(needMesh) + " --shape-format=" + meshtype + " --dir_name=" + floder_name
+        finetune_command = "python projector_withseg_new.py --outdir=" + finetune_path + " --target_img=dataset/" + floder_name + "/img --network models/" + source_Model + " --idx 0 --num-steps " + str(tune_steps) + " --idx 0 --num-steps-pti " + str(tune_steps_pti) + " --shapes=" + str(needMesh) + " --shape-format=" + meshtype + " --dir_name=" + floder_name
 
         print(os.system(finetune_command))
 
@@ -173,7 +174,7 @@ with gr.Blocks() as demo:
     prepareData_btn.click(prepareData,[img_rgb,folderName],[img_seg, project_label])    
     submit_seg_btn.click(replace_seg, [img_seg, project_label], gen_result)
 
-    finetune_btn.click(gen_finetunemodel,[project_label, finetune_steps, createMesh, mesh_type],[compare_video, output_video, finetune_model_path, finetune_latent_path])
+    finetune_btn.click(gen_finetunemodel,[project_label, finetune_steps, finetune_steps_pti, createMesh, mesh_type],[compare_video, output_video, finetune_model_path, finetune_latent_path])
 
     mul_video_btn.click(gen_videos, [video_up_angles, finetune_model_path, finetune_latent_path], gen_result)
     mul_img_btn.click(gen_images, [image_v_angles, image_h_angles, finetune_model_path, finetune_latent_path, img_name_type], gen_result)
