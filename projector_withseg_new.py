@@ -300,7 +300,8 @@ def run_projection(
     torch.manual_seed(seed)
 
     # Render debug output: optional video and projected image and W vector.
-    outdir = os.path.join(outdir, os.path.basename(network_pkl), str(dir_name))
+    #outdir = os.path.join(outdir, os.path.basename(network_pkl), str(dir_name))
+    outdir = os.path.join(outdir, str(dir_name))
     os.makedirs(outdir, exist_ok=True)
 
     # Load networks.
