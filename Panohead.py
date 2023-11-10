@@ -51,6 +51,7 @@ with gr.Blocks() as demo:
     with gr.Group():
         finetune_model_path = gr.Textbox(label="Fine tune model", value="")
         finetune_latent_path = gr.Textbox(label="Fine tune latent", value="")
+        createplyMesh = gr.Checkbox(False,label="Create ply geomtry with video?") 
         with gr.Row():
             video_up_angles = gr.Textbox(label="Video up angles", value="-1.4 -1.2 -1.0 -0.8 -0.7 -0.65 -0.6 -0.4 -0.2 0.0 0.2 0.4 0.6 0.8 1.0 1.2 1.4")
             mul_video_btn = gr.Button("create multiply view videos")
@@ -143,7 +144,7 @@ with gr.Blocks() as demo:
     ########################################
     #   generate multiple angles videos    #
     ########################################
-    def gen_videos(up_angles, modelpath, latentpath):
+    def gen_videos(up_angles, modelpath, latentpath, create_plyMesh):
         videopath = modelpath.replace("fintuned_generator.pkl","") + "videos"
         if not os.path.exists(videopath):
             os.makedirs(videopath)
@@ -151,7 +152,12 @@ with gr.Blocks() as demo:
         angles = up_angles.split(" ")
 
         for i in angles:
-            gen_command = "python gen_videos_proj_withseg.py --output=" + videopath + "/" + i + ".mp4 --latent=" + latentpath + " --trunc 0.7 --network " + modelpath + " --cfg Head --shapes=False --shape-format='.ply' --camera-up=" + i 
+            if i != angles[0]:
+                needCreateMesh = False
+            else:
+                needCreateMesh = create_plyMesh
+            
+            gen_command = "python gen_videos_proj_withseg.py --output=" + videopath + "/" + i + ".mp4 --latent=" + latentpath + " --trunc 0.7 --network " + modelpath + " --cfg Head --shapes=" + str(needCreateMesh) + " --shape-format='.ply' --camera-up=" + i 
             print(os.system(gen_command))
 
         return videopath 
@@ -179,7 +185,7 @@ with gr.Blocks() as demo:
 
     finetune_btn.click(gen_finetunemodel,[project_label, finetune_steps, finetune_steps_pti, createMesh, mesh_type, source_model_path],[compare_video, output_video, finetune_model_path, finetune_latent_path])
 
-    mul_video_btn.click(gen_videos, [video_up_angles, finetune_model_path, finetune_latent_path], gen_result)
+    mul_video_btn.click(gen_videos, [video_up_angles, finetune_model_path, finetune_latent_path, createplyMesh], gen_result)
     mul_img_btn.click(gen_images, [image_v_angles, image_h_angles, finetune_model_path, finetune_latent_path, img_name_type], gen_result)
 
 demo.launch()
