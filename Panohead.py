@@ -26,7 +26,7 @@ finetune_path = "pti_out"
 with gr.Blocks() as demo:
     with gr.Group():
         with gr.Row():
-            img_rgb = gr.Image(type="filepath", label="Source imgage", height=384, width=384)
+            img_rgb = gr.Image(type="filepath", label="Source image", height=384, width=384)
             img_seg = gr.Image(type="filepath", label="Mask image", height=384, width=384)
         with gr.Row():
             folderName = gr.Textbox(label="Project name",value="temp")
@@ -60,6 +60,14 @@ with gr.Blocks() as demo:
             image_h_angles = gr.Textbox(label="Image horizontal angles", value="-0.5 -0.4 -0.3 -0.25 -0.15 -0.1 0 0.1 0.15 0.25 0.3 0.4 0.5 0.57")
             img_name_type = gr.Dropdown(label="Name type", choices=['index', 'parameter'], value='index') 
             mul_img_btn = gr.Button("create multiply view images")
+        with gr.Row():
+            img_ref = gr.Image(type="filepath", label="refrence image", height=384, width=384)
+            img_result = gr.Image(type="filepath", label="result image", height=384, width=384)
+            cam_info = gr.Textbox(label="camera info", value="")
+        gen_ref_btn = gr.Button("get camera info")
+        #with gr.Row():
+            
+            #result_btn = gr.Button("create image")
 
         gen_result = gr.Textbox(label="Generate result")
     
@@ -179,6 +187,56 @@ with gr.Blocks() as demo:
 
         return imgpath
 
+    ##########################################
+    #   generate refrence angles picture     #
+    ##########################################
+    def gen_camalign_image(img_path, modelpath, latentpath, nametype):
+        image_path = Path(img_path)
+        image_raw = Image.open(image_path)
+
+        temp_folder_name = "cam_align_img"
+
+
+        source_img_folder = cropping_folder + "/img/" + temp_folder_name
+
+        if not os.path.exists(source_img_folder):
+            os.makedirs(source_img_folder)
+
+        target_img_folder = dataset_folder + "/" + temp_folder_name
+        if not os.path.exists(target_img_folder):
+            os.makedirs(target_img_folder)
+        if not os.path.exists(target_img_folder + "/img"):
+            os.makedirs(target_img_folder + "/img")
+        if not os.path.exists(target_img_folder + "/seg"):
+            os.makedirs(target_img_folder + "/seg")
+
+        source_img_path = source_img_folder + "/" + temp_folder_name + ".jpg"
+        img_final = image_raw.save(source_img_path)
+        print(os.system("sudo chmod 777 " + source_img_path))
+        #assert os.path.exists(source_img_path)
+
+
+        prepare_command ="python " + cropping_folder + "/dlib_kps_new.py " + "-i " + cropping_folder + " -sname " + temp_folder_name
+        print(os.system(prepare_command))
+
+        prepare_command ="python " + cropping_folder + "/recrop_images.py -i " + cropping_folder + "/data.pkl -o " + cropping_folder + "/quads.pkl --out_dir " + target_img_folder + "/img --config " + cropping_folder + "/configs/mb1_120x120_new.yml"
+        #print(prepare_command)
+        print(os.system(prepare_command))
+
+        prepare_command = "rembg i -om " + target_img_folder + "/img/" + temp_folder_name +".jpg " + target_img_folder + "/seg/" + temp_folder_name +".png"
+        print(os.system(prepare_command))
+
+
+
+        imgpath = modelpath.replace("fintuned_generator.pkl","") + "cam_ref"
+        gen_command = "python gen_samples_ref.py --outdir=" + imgpath + " --trunc=0.7 --target_img=dataset/" + temp_folder_name + "/img --network " + modelpath + " --shape-format='.ply' --shape-res=512 --camera-up=-0.9 --latent=" + latentpath + " --vangles='0.0'" + " --hangles='0.0'" + " --name-type=" + nametype
+        #print(gen_command)
+        print(os.system(gen_command))
+
+        #outdir = os.path.join(imgpath, os.path.splitext(modelpath)[0] + '_' + "90")
+
+        return imgpath + "/result.png"
+
 
     prepareData_btn.click(prepareData,[img_rgb,folderName],[img_seg, project_label])    
     submit_seg_btn.click(replace_seg, [img_seg, project_label], gen_result)
@@ -187,6 +245,8 @@ with gr.Blocks() as demo:
 
     mul_video_btn.click(gen_videos, [video_up_angles, finetune_model_path, finetune_latent_path, createplyMesh], gen_result)
     mul_img_btn.click(gen_images, [image_v_angles, image_h_angles, finetune_model_path, finetune_latent_path, img_name_type], gen_result)
+
+    gen_ref_btn.click(gen_camalign_image,[img_ref, finetune_model_path, finetune_latent_path, img_name_type],[img_result])
 
 demo.launch()
 

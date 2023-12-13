@@ -323,6 +323,7 @@ def run_projection(
         c = torch.from_numpy(dataset._get_raw_labels()[idx:idx+1]).to(device)
         print(f"projecting: [{idx}] {target_fname}")
         print(f"camera matrix: {c.shape}")
+        print(c)
     # Load target image.
     target_pil = PIL.Image.open(target_fname).convert('RGB')
     w, h = target_pil.size
