@@ -144,9 +144,9 @@ def generate_images(
     # target_fname = dataset._path + "/" + dataset._image_fnames[idx]
     target_fname = dataset._path + "/" + dataset._image_fnames[0]
     c = torch.from_numpy(dataset._get_raw_labels()[0:1]).to(device)
-    print(f"projecting: [{0}] {target_fname}")
-    print(f"camera matrix: {c.shape}")
-    print(c)
+    #print(f"projecting: [{0}] {target_fname}")
+    #print(f"camera matrix: {c.shape}")
+    #print(c)
 
     """Generate images using pretrained network pickle.
 
@@ -184,59 +184,6 @@ def generate_images(
 
     imgName = "result"
     PIL.Image.fromarray(img[0].cpu().numpy(), 'RGB').save(f'{outdir}/{imgName}.png')
-
-
-    # pose_cond_rad = pose_cond/180*np.pi
-
-    # intrinsics = FOV_to_intrinsics(fov_deg, device=device)
-
-
-    # cam_pivot = torch.tensor([0, 0, 0], device=device)
-    # cam_radius = G.rendering_kwargs.get('avg_camera_radius', 2.7)
-
-    # verticla_angles = []
-    # vangles = vangles.split(" ")
-    # for i in vangles:
-    #     verticla_angles.append(float(i))
-    
-    # horizontal_angles = []
-    # hangles = hangles.split(" ")
-    # for i in hangles:
-    #     horizontal_angles.append(float(i))
-    
-    # angle_pairs = []
-    # for i in verticla_angles:
-    #     for j in horizontal_angles:
-    #         angle_pairs.append((j,i))
-
-    # prefix_0 = ["","0","00","000","0000"]
-    # #imgs = []
-    # angle_p = camera_up
-    # # for angle_y, angle_p in [(2.1, angle_p), (1.05, angle_p), (0, angle_p), (-1.05, angle_p), (-2.1, angle_p)]:
-    # #for idx, angles in enumerate([(0, angle_p), (-45/180*np.pi, angle_p), (-90/180*np.pi, angle_p), (-135/180*np.pi, angle_p), (-np.pi, angle_p)]):
-
-
-
-    # for idx, angles in enumerate(angle_pairs):
-    #     imgName = prefix_0[len(prefix_0) - len(str(idx))] + str(idx)
-
-    #     angle_y = angles[0]
-    #     angle_p = angles[1]
-    #     # rand camera setting
-    #     cam2world_pose = LookAtPoseSampler.sample(np.pi/2 + angle_y * np.pi, np.pi/2 + angle_p, cam_pivot, radius=cam_radius, device=device)
-    #     camera_params = torch.cat([cam2world_pose.reshape(-1, 16), intrinsics.reshape(-1, 9)], 1)
-    #     print(camera_params)
-
-    #     #ws = G.mapping(z, conditioning_params, truncation_psi=truncation_psi, truncation_cutoff=truncation_cutoff)
-    #     ws = torch.tensor(np.load(latent)['w']).to(device)
-    #     # img = G.synthesis(ws, camera_params, ws_bcg = ws_list[idx])['image']
-    #     img = G.synthesis(ws, camera_params)['image']
-    #     img = (img.permute(0, 2, 3, 1) * 127.5 + 128).clamp(0, 255).to(torch.uint8)
-
-    #     if name_type == 'parameter':
-    #         imgName = str(angle_p) + "_" + str(round(angle_y,2))
-    #     PIL.Image.fromarray(img[0].cpu().numpy(), 'RGB').save(f'{outdir}/{imgName}.png')
-        #imgs.append(img)
 
 
 #----------------------------------------------------------------------------
